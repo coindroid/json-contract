@@ -7,11 +7,24 @@ var __extends = (this && this.__extends) || (function () {
         return extendStatics(d, b);
     };
     return function (d, b) {
+        if (typeof b !== "function" && b !== null)
+            throw new TypeError("Class extends value " + String(b) + " is not a constructor or null");
         extendStatics(d, b);
         function __() { this.constructor = d; }
         d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
     };
 })();
+var __assign = (this && this.__assign) || function () {
+    __assign = Object.assign || function(t) {
+        for (var s, i = 1, n = arguments.length; i < n; i++) {
+            s = arguments[i];
+            for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p))
+                t[p] = s[p];
+        }
+        return t;
+    };
+    return __assign.apply(this, arguments);
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 var Option_1 = require("./Option");
 var SelectItem_1 = require("./SelectItem");
@@ -24,8 +37,8 @@ var OptionSelect = (function (_super) {
         return _this;
     }
     OptionSelect.buildOption = function (_a) {
-        var anyData = _a.anyData, description = _a.description, id = _a.id, isRequired = _a.isRequired, isHidden = _a.isHidden, label = _a.label, options = _a.options, type = _a.type;
-        var optionsObj = options.map(function (opt) { return SelectItem_1.default.buildItem(opt); });
+        var anyData = _a.anyData, description = _a.description, id = _a.id, isRequired = _a.isRequired, isHidden = _a.isHidden, label = _a.label, options = _a.options, type = _a.type, childContracts = _a.childContracts;
+        var optionsObj = options.map(function (opt) { return SelectItem_1.default.buildItem(__assign(__assign({}, opt), { childContracts: childContracts })); });
         return new OptionSelect(id, type, label, optionsObj, isRequired, isHidden, description, anyData);
     };
     OptionSelect.prototype.validate = function (value, document) {

@@ -2,6 +2,7 @@ import Option from "./Option";
 import SelectItem, {SelectItemBuilder} from "./SelectItem";
 import Reason from "./Reason";
 import Document from "./Document";
+import ProductContract from "./ProductContract";
 
 /**
  * Класс, описывающий поле выбора из нескольких вариантов
@@ -39,9 +40,10 @@ export default class OptionSelect extends Option {
    * @param isHidden - скрывать ли опцию
    * @param description - описание
    * @param anyData - любые данные
+   * @param childContracts
    */
-  public static buildOption({anyData, description, id, isRequired, isHidden, label, options, type}: OptionSelectBuilder): OptionSelect {
-    const optionsObj = options.map(opt => SelectItem.buildItem(opt));
+  public static buildOption({anyData, description, id, isRequired, isHidden, label, options, type, childContracts}: OptionSelectBuilder): OptionSelect {
+    const optionsObj = options.map(opt => SelectItem.buildItem({...opt, childContracts}));
     return new OptionSelect(id, type, label, optionsObj, isRequired, isHidden, description, anyData);
   }
 
@@ -121,5 +123,6 @@ export default class OptionSelect extends Option {
  * Интерфейс для создания [[OptionSelect]]
  */
 export interface OptionSelectBuilder extends Option {
+  childContracts?: ProductContract[];
   options: SelectItemBuilder[];
 }

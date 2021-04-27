@@ -3,6 +3,8 @@
 import {Document} from "..";
 import should = require("should");
 import Reason from '../core/Reason';
+import {Value} from "../core/Document";
+import ProductContract from "../core/ProductContract";
 
 const document1Data = require('./data/document1-data.json');
 const document1Expected = require('./data/document1-expected.json');
@@ -12,6 +14,9 @@ const numberProductContract = require('./data/productContract-with-number-option
 const stringProductContract = require('./data/productContract-with-string-option.json');
 const selectProductContractSimple = require('./data/productContract-with-simple-select-option.json');
 const selectProductContractComplex = require('./data/productContract-with-complex-select-option.json');
+const contractProductContract = require('./data/productContract-with-contract-option.json');
+const contractProductContractComplex = require('./data/productContract-with-complex-contract-option.json');
+const numberRequiredProductContract = require('./data/productContract-with-number-option-required.json');
 
 describe('Document', () => {
 
@@ -329,6 +334,102 @@ describe('Document', () => {
         should(document.getRejectReason()).be.undefined();
       });
 
+    });
+
+    describe('for contract option', () => {
+
+      beforeEach(() => {
+
+        document = Document.build({
+          values: [
+            {
+              id: 'contractOption',
+              value: [
+                {
+                  id: 'numberOption',
+                  value: 50
+                }
+              ]
+            }
+          ],
+          productContract: contractProductContract,
+          childContracts: [
+            numberProductContract
+          ]
+        });
+      });
+
+      it('should return ok', () => {
+        document.check().should.be.true();
+        should(document.getRejectReason()).be.undefined();
+      });
+
+      it('should reject if number options in inner contract is larger than maximum', () => {
+        const contract = document.values.find(v => v.id === 'contractOption');
+        if (!contract) {
+          throw new Error('There is not contract option');
+        }
+
+        const numberValue = contract.value.find((v: Value) => v.id === 'numberOption');
+        numberValue.value = 200;
+
+        document.check().should.be.false();
+        const reason = new Reason('LTM', 'larger than max');
+        reason.rejectOption = 'contractOption:numberOption';
+        should(document.getRejectReason()).be.eql(reason);
+      });
+
+    });
+
+    describe('for complex contract option', () => {
+
+      beforeEach(() => {
+        document = Document.build({
+          values: [
+            {
+              id: 'selectOption',
+              value: 'selectWithStringContract'
+            },
+            {
+              id: 'stringOption',
+              value: 'test'
+            },
+            {
+              id: 'contractOption',
+              value: [
+                {
+                  id: 'numberOptionRequired',
+                  value: 18
+                }
+              ]
+            }
+          ],
+          productContract: contractProductContractComplex,
+          childContracts: [
+            numberRequiredProductContract,
+            stringProductContract
+          ]
+        });
+      });
+
+      it('should return ok', () => {
+        document.check().should.be.true();
+        should(document.getRejectReason()).be.undefined();
+      });
+
+      it('should reject with required error', () => {
+        const contractValue = document.values.find(v => v.id === 'contractOption');
+        if (!contractValue) {
+          throw new Error('There is not contract option');
+        }
+
+        contractValue.value = [];
+
+        document.check().should.be.false();
+        const reason = new Reason('IR', 'is required');
+        reason.rejectOption = 'selectOption:contractOption:numberOptionRequired';
+        should(document.getRejectReason()).be.eql(reason);
+      });
 
     });
 

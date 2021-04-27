@@ -3,6 +3,7 @@ import DiscountContract from "./DiscountContract";
 import ProductContractD from "./ProductContractD";
 import Property from "../core/Property";
 import {objectToProperties} from "../lib/util";
+import ProductContract from "../core/ProductContract";
 
 /**
  * Описывает документ с вохможность добавления и обработки скидок. Скидки действуют не на сам документ, а только на
@@ -23,16 +24,16 @@ export default class DocumentD extends Document implements DocumentDiscountBuild
   productContractModified: ProductContractD;
 
   constructor(productContract: ProductContractD);
-  constructor(productContract: ProductContractD, values: Value[]);
-  constructor(productContract: ProductContractD, values: Value[], args: Property<Document>[]);
+  constructor(productContract: ProductContractD, values?: Value[], childContracts?: ProductContract[], args?: Property<Document>[])
   /**
    * Аналогично родительскому конструктору (см. [[Document]])
    * @param productContract
    * @param values
+   * @param childContracts
    * @param args
    */
-  constructor(productContract: ProductContractD, values?: Value[], args?: Property<Document>[]) {
-    super(productContract, values, args);
+  constructor(productContract: ProductContractD, values?: Value[], childContracts?: ProductContract[], args?: Property<Document>[]) {
+    super(productContract, values, childContracts, args);
     this.discountContracts = [];
     this.productContract = productContract;
     this.productContractModified = productContract.clone();
@@ -45,13 +46,16 @@ export default class DocumentD extends Document implements DocumentDiscountBuild
    * @param productContract - [[ProductContractD]], может быть JSON или екземляр класса. Если это JSON, то будет создан новый екземпляр [[ProductContractD]] на его основе,
    * если это екземпляр, то он будет скопирован, опять же, рекурсивно
    * @param values - Массив пар id-значение. При создании не проверяется, для проверки используйте родительским метод validate
+   * @param childContracts
    * @param args - Дополнительные поля (для внешних модулей)
    * @return new [[DocumentD]]
    */
-  public static build({productContract, values, ...args}: DocumentDiscountBuild): DocumentD {
+  public static build({productContract, values, childContracts, ...args}: DocumentDiscountBuild): DocumentD {
     const valuesObj = values.map(v => new Value(v.id, v.value));
     productContract = ProductContractD.build(productContract);
-    return new DocumentD(productContract, valuesObj, objectToProperties(<any>args));
+    childContracts = childContracts || [];
+    childContracts = childContracts.map(c => ProductContract.build(c));
+    return new DocumentD(productContract, valuesObj, childContracts, objectToProperties(<any>args));
   }
 
   /**

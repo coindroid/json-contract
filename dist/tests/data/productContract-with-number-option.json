@@ -1,4 +1,5 @@
 {
+  "contractId": "contract-number",
   "name": "Test1",
   "locale": "EN",
   "description": "Simple test contract",

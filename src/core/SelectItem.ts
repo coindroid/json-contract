@@ -64,13 +64,14 @@ export default class SelectItem {
    * @param showOptionsById - массив id опций, которые нужно показать (см. [[Action]])
    * @param setCustomProperties - изменение свойств (см. [[Action]])
    * @param anyData - другие данные
+   * @param childContracts
    */
   public static buildItem({
                             id, label, description, options, changeProperties, hideOptionsById, modifyDeliveryTime,
-                            modifyPrice, setDiscountInPercentage, showOptionsById, setCustomProperties, anyData
+                            modifyPrice, setDiscountInPercentage, showOptionsById, setCustomProperties, anyData, childContracts
                           }: SelectItemBuilder): SelectItem {
     if (options)
-      options = options.map(opt => Option.getOption(opt));
+      options = options.map(opt => Option.getOption(<any>{...opt, childContracts}));
 
     const formObj = new Form(options);
     const actionObj = Action.build({
@@ -115,5 +116,6 @@ export interface SelectItemBuilder extends FormBuilder, ActionBuilder<ProductCon
   id: string;
   label: string;
   description?: string;
-  anyData?: string
+  anyData?: string;
+  childContracts?: ProductContract[];
 }

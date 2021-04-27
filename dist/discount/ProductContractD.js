@@ -7,6 +7,8 @@ var __extends = (this && this.__extends) || (function () {
         return extendStatics(d, b);
     };
     return function (d, b) {
+        if (typeof b !== "function" && b !== null)
+            throw new TypeError("Class extends value " + String(b) + " is not a constructor or null");
         extendStatics(d, b);
         function __() { this.constructor = d; }
         d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
@@ -29,17 +31,17 @@ var Option_1 = require("../core/Option");
 var util_1 = require("../lib/util");
 var ProductContractD = (function (_super) {
     __extends(ProductContractD, _super);
-    function ProductContractD(options, name, locale, description, specificationMinVersion, prefix, badge, price, currency, start, finish, discountAllowed, discountCumulativeAllowed, revision, deliveryTime, discounts, args) {
-        var _this = _super.call(this, options, name, locale, description, specificationMinVersion, prefix, badge, price, currency, start, finish, revision, deliveryTime, args) || this;
+    function ProductContractD(options, childForms, contractId, name, locale, description, specificationMinVersion, prefix, badge, price, currency, start, finish, discountAllowed, discountCumulativeAllowed, revision, deliveryTime, discounts, args) {
+        var _this = _super.call(this, options, childForms, name, contractId, locale, description, specificationMinVersion, prefix, badge, price, currency, start, finish, revision, deliveryTime, args) || this;
         _this.discounts = discounts || [];
         _this.discountAllowed = discountAllowed || true;
         _this.discountCumulativeAllowed = discountCumulativeAllowed || true;
         return _this;
     }
     ProductContractD.build = function (_a) {
-        var locale = _a.locale, name = _a.name, options = _a.options, discountCumulativeAllowed = _a.discountCumulativeAllowed, badge = _a.badge, deliveryTime = _a.deliveryTime, currency = _a.currency, description = _a.description, discountAllowed = _a.discountAllowed, prefix = _a.prefix, finish = _a.finish, price = _a.price, revision = _a.revision, specificationMinVersion = _a.specificationMinVersion, start = _a.start, discounts = _a.discounts, args = __rest(_a, ["locale", "name", "options", "discountCumulativeAllowed", "badge", "deliveryTime", "currency", "description", "discountAllowed", "prefix", "finish", "price", "revision", "specificationMinVersion", "start", "discounts"]);
+        var locale = _a.locale, childContracts = _a.childContracts, contractId = _a.contractId, name = _a.name, options = _a.options, discountCumulativeAllowed = _a.discountCumulativeAllowed, badge = _a.badge, deliveryTime = _a.deliveryTime, currency = _a.currency, description = _a.description, discountAllowed = _a.discountAllowed, prefix = _a.prefix, finish = _a.finish, price = _a.price, revision = _a.revision, specificationMinVersion = _a.specificationMinVersion, start = _a.start, discounts = _a.discounts, args = __rest(_a, ["locale", "childContracts", "contractId", "name", "options", "discountCumulativeAllowed", "badge", "deliveryTime", "currency", "description", "discountAllowed", "prefix", "finish", "price", "revision", "specificationMinVersion", "start", "discounts"]);
         options = options.map(function (opt) { return Option_1.default.getOption(opt); });
-        return new ProductContractD(options, name, locale, description, specificationMinVersion, prefix, badge, price, currency, start, finish, discountAllowed, discountCumulativeAllowed, revision, deliveryTime, discounts, util_1.objectToProperties(args));
+        return new ProductContractD(options, childContracts, contractId, name, locale, description, specificationMinVersion, prefix, badge, price, currency, start, finish, discountAllowed, discountCumulativeAllowed, revision, deliveryTime, discounts, util_1.objectToProperties(args));
     };
     ProductContractD.prototype.clone = function () {
         return ProductContractD.build(this.getJSON());

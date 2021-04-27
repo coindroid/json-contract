@@ -1,10 +1,10 @@
 {
   "name": "Test1",
   "locale": "EN",
-  "description": "Simple test contract",
+  "description": "Complex test contract with inner contracts",
   "specificationMinVersion": 1,
-  "prefix": "T4",
-  "badge": "test_4",
+  "prefix": "T6",
+  "badge": "test_6",
   "price": 100,
   "currency": "USD",
   "start": 1611492655398,
@@ -21,7 +21,7 @@
       "isRequired": true,
       "options": [
         {
-          "id": "selectWithNumberString",
+          "id": "selectWithStringContract",
           "type": "radio",
           "label": "option 1",
           "max": 10,
@@ -38,21 +38,13 @@
               "isHidden": true
             },
             {
-              "id": "numberOptionRequired",
-              "label": "Number option",
-              "description": "Number here",
-              "type": "number",
-              "max": 10,
-              "regex": "^[0-9]+$",
-              "isRequired": true
-            },
-            {
-              "id": "numberOption",
-              "label": "Number option",
-              "description": "Number here",
-              "type": "number",
-              "maxLength": 3,
-              "regex": "^[0-9]+$"
+              "id": "contractOption",
+              "type": "contract",
+              "label": "Contract option 1",
+              "description": "Contract for option 1",
+              "isRequired": true,
+              "isHidden": false,
+              "productContractId": "contract-number-required"
             }
           ]
         },
@@ -73,7 +65,17 @@
                   "id": "s-1",
                   "type": "radio",
                   "label": "option 1",
-                  "description": "First option"
+                  "description": "First option",
+                  "options": [
+                    {
+                      "id": "contractOptionInner",
+                      "label": "Complete contract",
+                      "description": "Complete here",
+                      "type": "contract",
+                      "isRequired": true,
+                      "productContractId": "contract-string"
+                    }
+                  ]
                 },
                 {
                   "id": "s-2",

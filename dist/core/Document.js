@@ -18,12 +18,13 @@ var util_1 = require("../lib/util");
 var uuid = require("uuid");
 var Option_1 = require("./Option");
 var Document = (function () {
-    function Document(productContract, values, args) {
+    function Document(productContract, values, childContracts, args) {
         this.productContract = productContract;
         this.controlHash = '';
         this.values = values || [];
         this.documentId = uuid.v4();
         this.productContractModified = this.productContract.clone();
+        this.childContracts = childContracts || [];
         if (args)
             for (var _i = 0, args_1 = args; _i < args_1.length; _i++) {
                 var i = args_1[_i];
@@ -31,10 +32,12 @@ var Document = (function () {
             }
     }
     Document.build = function (_a) {
-        var productContract = _a.productContract, values = _a.values, args = __rest(_a, ["productContract", "values"]);
+        var productContract = _a.productContract, values = _a.values, childContracts = _a.childContracts, args = __rest(_a, ["productContract", "values", "childContracts"]);
         values = values.map(function (v) { return new Value(v.id, v.value); });
-        productContract = ProductContract_1.default.build(productContract);
-        return new Document(productContract, values, util_1.objectToProperties(args));
+        childContracts = childContracts || [];
+        childContracts = childContracts.map(function (c) { return ProductContract_1.default.build(c); });
+        productContract = ProductContract_1.default.build(productContract, childContracts);
+        return new Document(productContract, values, childContracts, util_1.objectToProperties(args));
     };
     Document.prototype.check = function () {
         return this.productContract.validate(this);

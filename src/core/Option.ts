@@ -90,6 +90,8 @@ export default class Option {
         return OptionNumber.buildOption(data);
       case OptionTypes.SELECT:
         return OptionSelect.buildOption(<any>data);
+      case OptionTypes.CONTRACT:
+        return OptionContract.buildOption(<any>data);
     }
     return Option.buildOption(data);
   }
@@ -145,9 +147,11 @@ export default class Option {
 export enum OptionTypes {
   STRING = 'string',
   NUMBER = 'number',
-  SELECT = 'select'
+  SELECT = 'select',
+  CONTRACT = 'contract'
 }
 
 import OptionString from "./OptionString";
 import OptionNumber from "./OptionNumber";
 import OptionSelect from "./OptionSelect";
+import OptionContract from "./OptionContract";

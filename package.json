@@ -12,10 +12,6 @@
   "author": "Ilya Dolmatov",
   "license": "MIT",
   "keywords": [],
-  "dependencies": {
-    "@types/uuid": "^3.4.6",
-    "uuid": "^3.3.3"
-  },
   "devDependencies": {
     "@types/mocha": "^8.2.0",
     "@types/sinon": "^9.0.10",

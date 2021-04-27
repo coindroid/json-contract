@@ -24,6 +24,8 @@ var Option = (function () {
                 return OptionNumber_1.default.buildOption(data);
             case OptionTypes.SELECT:
                 return OptionSelect_1.default.buildOption(data);
+            case OptionTypes.CONTRACT:
+                return OptionContract_1.default.buildOption(data);
         }
         return Option.buildOption(data);
     };
@@ -56,7 +58,9 @@ var OptionTypes;
     OptionTypes["STRING"] = "string";
     OptionTypes["NUMBER"] = "number";
     OptionTypes["SELECT"] = "select";
+    OptionTypes["CONTRACT"] = "contract";
 })(OptionTypes = exports.OptionTypes || (exports.OptionTypes = {}));
 var OptionString_1 = require("./OptionString");
 var OptionNumber_1 = require("./OptionNumber");
 var OptionSelect_1 = require("./OptionSelect");
+var OptionContract_1 = require("./OptionContract");

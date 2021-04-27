@@ -7,6 +7,8 @@ var __extends = (this && this.__extends) || (function () {
         return extendStatics(d, b);
     };
     return function (d, b) {
+        if (typeof b !== "function" && b !== null)
+            throw new TypeError("Class extends value " + String(b) + " is not a constructor or null");
         extendStatics(d, b);
         function __() { this.constructor = d; }
         d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
@@ -27,20 +29,23 @@ Object.defineProperty(exports, "__esModule", { value: true });
 var Document_1 = require("../core/Document");
 var ProductContractD_1 = require("./ProductContractD");
 var util_1 = require("../lib/util");
+var ProductContract_1 = require("../core/ProductContract");
 var DocumentD = (function (_super) {
     __extends(DocumentD, _super);
-    function DocumentD(productContract, values, args) {
-        var _this = _super.call(this, productContract, values, args) || this;
+    function DocumentD(productContract, values, childContracts, args) {
+        var _this = _super.call(this, productContract, values, childContracts, args) || this;
         _this.discountContracts = [];
         _this.productContract = productContract;
         _this.productContractModified = productContract.clone();
         return _this;
     }
     DocumentD.build = function (_a) {
-        var productContract = _a.productContract, values = _a.values, args = __rest(_a, ["productContract", "values"]);
+        var productContract = _a.productContract, values = _a.values, childContracts = _a.childContracts, args = __rest(_a, ["productContract", "values", "childContracts"]);
         var valuesObj = values.map(function (v) { return new Document_1.Value(v.id, v.value); });
         productContract = ProductContractD_1.default.build(productContract);
-        return new DocumentD(productContract, valuesObj, util_1.objectToProperties(args));
+        childContracts = childContracts || [];
+        childContracts = childContracts.map(function (c) { return ProductContract_1.default.build(c); });
+        return new DocumentD(productContract, valuesObj, childContracts, util_1.objectToProperties(args));
     };
     DocumentD.prototype.processing = function (contract) {
         this.productContractModified = (contract || this.productContract).clone();
