@@ -47,6 +47,9 @@ var numberProductContract = require('./data/productContract-with-number-option.j
 var stringProductContract = require('./data/productContract-with-string-option.json');
 var selectProductContractSimple = require('./data/productContract-with-simple-select-option.json');
 var selectProductContractComplex = require('./data/productContract-with-complex-select-option.json');
+var contractProductContract = require('./data/productContract-with-contract-option.json');
+var contractProductContractComplex = require('./data/productContract-with-complex-contract-option.json');
+var numberRequiredProductContract = require('./data/productContract-with-number-option-required.json');
 describe('Document', function () {
     it('should correct create document from JSON', function () {
         document1Data.productContract = simpleProductContractData;
@@ -303,6 +306,88 @@ describe('Document', function () {
                     return [2];
                 });
             }); });
+        });
+        describe('for contract option', function () {
+            beforeEach(function () {
+                document = __1.Document.build({
+                    values: [
+                        {
+                            id: 'contractOption',
+                            value: [
+                                {
+                                    id: 'numberOption',
+                                    value: 50
+                                }
+                            ]
+                        }
+                    ],
+                    productContract: contractProductContract,
+                    childContracts: [
+                        numberProductContract
+                    ]
+                });
+            });
+            it('should return ok', function () {
+                document.check().should.be.true();
+                should(document.getRejectReason()).be.undefined();
+            });
+            it('should reject if number options in inner contract is larger than maximum', function () {
+                var contract = document.values.find(function (v) { return v.id === 'contractOption'; });
+                if (!contract) {
+                    throw new Error('There is not contract option');
+                }
+                var numberValue = contract.value.find(function (v) { return v.id === 'numberOption'; });
+                numberValue.value = 200;
+                document.check().should.be.false();
+                var reason = new Reason_1.default('LTM', 'larger than max');
+                reason.rejectOption = 'contractOption:numberOption';
+                should(document.getRejectReason()).be.eql(reason);
+            });
+        });
+        describe('for complex contract option', function () {
+            beforeEach(function () {
+                document = __1.Document.build({
+                    values: [
+                        {
+                            id: 'selectOption',
+                            value: 'selectWithStringContract'
+                        },
+                        {
+                            id: 'stringOption',
+                            value: 'test'
+                        },
+                        {
+                            id: 'contractOption',
+                            value: [
+                                {
+                                    id: 'numberOptionRequired',
+                                    value: 18
+                                }
+                            ]
+                        }
+                    ],
+                    productContract: contractProductContractComplex,
+                    childContracts: [
+                        numberRequiredProductContract,
+                        stringProductContract
+                    ]
+                });
+            });
+            it('should return ok', function () {
+                document.check().should.be.true();
+                should(document.getRejectReason()).be.undefined();
+            });
+            it('should reject with required error', function () {
+                var contractValue = document.values.find(function (v) { return v.id === 'contractOption'; });
+                if (!contractValue) {
+                    throw new Error('There is not contract option');
+                }
+                contractValue.value = [];
+                document.check().should.be.false();
+                var reason = new Reason_1.default('IR', 'is required');
+                reason.rejectOption = 'selectOption:contractOption:numberOptionRequired';
+                should(document.getRejectReason()).be.eql(reason);
+            });
         });
     });
     it('should add option', function () {

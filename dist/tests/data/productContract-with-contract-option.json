@@ -1,11 +1,11 @@
 {
-  "contractId": "contract-string",
   "name": "Test1",
+  "contractId": "contract-with-contract",
   "locale": "EN",
   "description": "Simple test contract",
   "specificationMinVersion": 1,
-  "prefix": "T2",
-  "badge": "test_2",
+  "prefix": "T5",
+  "badge": "test_5",
   "price": 100,
   "currency": "USD",
   "start": 1611492655398,
@@ -15,14 +15,11 @@
   "someSpecificData": "specific data",
   "options": [
     {
-      "id": "stringOption",
-      "type": "string",
-      "maxLength": 10,
-      "minLength": 3,
-      "regex": "^[a-zA-Z0-9]+$",
-      "label": "String option",
-      "description": "String here",
-      "isRequired": true
+      "id": "contractOption",
+      "label": "Contract option",
+      "description": "Complete contract here",
+      "type": "contract",
+      "productContractId": "contract-number"
     }
   ]
 }

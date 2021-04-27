@@ -11,22 +11,33 @@ export default class Form implements FormBuilder {
    * обрабатываются
    */
   options: Option[];
+  /**
+   *
+   */
+  childContracts: Form[];
 
-  public constructor(options?: Option[]) {
+  /**
+   *
+   * @param options
+   * @param childContracts
+   */
+  public constructor(options?: Option[], childContracts?: Form[]) {
     this.options = options || [];
+    this.childContracts = childContracts || [];
   }
 
   /**
    * Создаёт документ из JSON. Используется только при клонировании. Как и другие методы build делает глубокое создание моделей
    * @param options
+   * @param childContracts
    */
-  protected static build({options}: Form): Form {
+  protected static build({options}: Form, childContracts?: Form[]): Form {
     options = options.map(opt => Option.getOption(opt));
-    return new Form(options);
+    return new Form(options, childContracts);
   }
 
   /**
-   * Проверяет, что переданный документ содержит валиданые значения для options этого экземпляра
+   * Проверяет, что переданный документ содержит валидные значения для options этого экземпляра
    * @param document - Документ, подлежащий проверке
    */
   public validate(document: Document): boolean {
@@ -50,7 +61,7 @@ export default class Form implements FormBuilder {
   public getRejectReason(document: Document): Reason | undefined {
     for (let option of this.options) {
       let value = document.values.filter(v => v.id === option.id)[0] || {} as Value;
-      if (option.type === OptionTypes.SELECT) {
+      if (option.type === OptionTypes.SELECT || option.type === OptionTypes.CONTRACT) {
         const reason = (<OptionSelect>option).getRejectReason(value.value, document);
         if (reason) {
           reason.rejectOption = `${option.id}${reason.rejectOption ? ':' + reason.rejectOption : ''}`;
@@ -84,7 +95,7 @@ export default class Form implements FormBuilder {
    * Создаёт глубокую копию текущего экземпляра.
    */
   public clone(): Form {
-    return Form.build(this.getJSON());
+    return Form.build(this.getJSON(), this.childContracts);
   }
 
   /**

@@ -2,13 +2,14 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 var Option_1 = require("./Option");
 var Form = (function () {
-    function Form(options) {
+    function Form(options, childContracts) {
         this.options = options || [];
+        this.childContracts = childContracts || [];
     }
-    Form.build = function (_a) {
+    Form.build = function (_a, childContracts) {
         var options = _a.options;
         options = options.map(function (opt) { return Option_1.default.getOption(opt); });
-        return new Form(options);
+        return new Form(options, childContracts);
     };
     Form.prototype.validate = function (document) {
         var _loop_1 = function (option) {
@@ -33,7 +34,7 @@ var Form = (function () {
     Form.prototype.getRejectReason = function (document) {
         var _loop_2 = function (option) {
             var value = document.values.filter(function (v) { return v.id === option.id; })[0] || {};
-            if (option.type === Option_1.OptionTypes.SELECT) {
+            if (option.type === Option_1.OptionTypes.SELECT || option.type === Option_1.OptionTypes.CONTRACT) {
                 var reason = option.getRejectReason(value.value, document);
                 if (reason) {
                     reason.rejectOption = "" + option.id + (reason.rejectOption ? ':' + reason.rejectOption : '');
@@ -62,7 +63,7 @@ var Form = (function () {
         modifiers.forEach(function (modifier) { return modifier.action.activate(document.productContractModified); });
     };
     Form.prototype.clone = function () {
-        return Form.build(this.getJSON());
+        return Form.build(this.getJSON(), this.childContracts);
     };
     Form.prototype.getJSON = function () {
         var clone = Object.assign({}, this);

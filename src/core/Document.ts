@@ -35,28 +35,31 @@ export default class Document implements DocumentBuild {
    */
   productContractModified: ProductContract;
 
+  childContracts: ProductContract[];
+
   /**
    * Любые другие поля для внешних модулей
    */
   [x: string]: any;
 
   constructor(productContract: ProductContract)
-  constructor(productContract: ProductContract, values?: Value[])
-  constructor(productContract: ProductContract, values?: Value[], args?: Property<Document>[])
+  constructor(productContract: ProductContract, values?: Value[], childContracts?: ProductContract[], args?: Property<Document>[])
   /**
    * При создании генерирует [[documentId]] и клонирует [[ProductContract]] в [[productContractModified]]
    *
    * @constructor
    * @param productContract - [[ProductContract]] для которого предназначен документ
    * @param values - Массив, если такие уже есть
+   * @param childContracts
    * @param args - Дополнительные поля (для внешних модулей)
    */
-  public constructor(productContract: ProductContract, values?: Value[], args?: Property<Document>[]) {
+  public constructor(productContract: ProductContract, values?: Value[], childContracts?: ProductContract[], args?: Property<Document>[]) {
     this.productContract = productContract;
     this.controlHash = '';
     this.values = values || [];
     this.documentId = uuid.v4();
     this.productContractModified = this.productContract.clone();
+    this.childContracts = childContracts || [];
 
     if (args)
       for (let i of args)
@@ -70,13 +73,16 @@ export default class Document implements DocumentBuild {
    * @param productContract - [[ProductContract]], может быть JSON или экземпляр класса. Если это JSON, то будет создан новый экземпляр [[ProductContract]] на его основе,
    * если это экземпляр, то он будет скопирован, опять же, рекурсивно
    * @param values - Массив пар id-значение. При создании не проверяется, для проверки используйте метод [[validate]]
+   * @param childContracts
    * @param args - Дополнительные поля (для внешних модулей)
    * @return new [[Document]]
    */
-  public static build({productContract, values, ...args}: DocumentBuild): Document {
+  public static build({productContract, values, childContracts, ...args}: DocumentBuild): Document {
     values = values.map(v => new Value(v.id, v.value));
-    productContract = ProductContract.build(productContract);
-    return new Document(productContract, values, objectToProperties(<Document>args));
+    childContracts = childContracts || [];
+    childContracts = childContracts.map(c => ProductContract.build(c));
+    productContract = ProductContract.build(productContract, childContracts);
+    return new Document(productContract, values, childContracts, objectToProperties(<Document>args));
   }
 
   /**
@@ -200,6 +206,7 @@ export default class Document implements DocumentBuild {
  */
 export interface DocumentBuild {
   productContract: ProductContract;
+  childContracts?: ProductContract[];
   values: Value[];
 }
 

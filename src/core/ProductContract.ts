@@ -2,7 +2,6 @@ import Option from "./Option";
 import Form from "./Form";
 import Property from "./Property";
 import {objectToProperties} from "../lib/util";
-import * as uuid from 'uuid';
 
 /**
  * Класс, являющийся шаблоном для заполнения. Хранит в себе общие данные для будущего документа. В документе хранится два
@@ -73,6 +72,8 @@ export default class ProductContract extends Form implements ProductContractBuil
 
   /**
    * @param options - [[Option]][], которые хранит этот контракт
+   * @param childContracts - дочерние контракты
+   * @param contractId - id контракта
    * @param name - название
    * @param locale - локализация
    * @param description - описание
@@ -87,14 +88,14 @@ export default class ProductContract extends Form implements ProductContractBuil
    * @param deliveryTime - время доставки
    * @param args - иные параметры
    */
-  constructor(options: Option[], name: string, locale: string, description: string, specificationMinVersion: number,
-              prefix: string, badge: string, price: number, currency: string, start: number, finish: number,
-              revision: number, deliveryTime: number, args?: Property<ProductContract>[]) {
-    super(options);
+  constructor(options: Option[], childContracts: Form[], contractId: string, name: string, locale: string, description: string,
+              specificationMinVersion: number, prefix: string, badge: string, price: number, currency: string,
+              start: number, finish: number, revision: number, deliveryTime: number, args?: Property<ProductContract>[]) {
+    super(options, childContracts);
     this.name = name;
     this.locale = locale;
     this.description = description;
-    this.contractId = uuid.v4();
+    this.contractId = contractId;
     this.specificationMinVersion = specificationMinVersion;
     this.prefix = prefix;
     this.badge = badge;
@@ -117,11 +118,12 @@ export default class ProductContract extends Form implements ProductContractBuil
    * лучше использовать метод [[clone]]. Данный метод выступает как парсер из JSON в объект, а не как клонирование
    *
    * @param options - [[Option]][], которые хранит этот контракт
+   * @param childForms - дочерние контракты
+   * @param contractId - id контракта
    * @param name - название
    * @param locale - локализация
    * @param description - описание
    * @param specificationMinVersion - Минимальная версия модуля обработки контракта
-   * @param documentsPrefix - префикс
    * @param badge -
    * @param price - цена
    * @param currency - валюта
@@ -130,20 +132,22 @@ export default class ProductContract extends Form implements ProductContractBuil
    * @param revision -
    * @param deliveryTime - время доставки
    * @param args - иные параметры
+   * @param childContracts - дочерние контракты
    */
-  public static build({locale, name, options, badge, deliveryTime, currency, description, prefix,
+  public static build({locale, name, options, contractId, badge, deliveryTime, currency, description, prefix,
                         finish, price, revision, specificationMinVersion, start, ...args
-                      }: ProductContractBuild): ProductContract {
-    options = options.map(opt => Option.getOption(opt));
-    return new ProductContract(options, name, locale, description, specificationMinVersion, prefix, badge,
-      price, currency, start, finish, revision, deliveryTime, objectToProperties(<ProductContract>args));
+                      }: ProductContractBuild, childContracts?: ProductContract[]): ProductContract {
+    childContracts = childContracts || [];
+    options = options.map(opt => Option.getOption(<any>{...opt, childContracts}));
+    return new ProductContract(options, childContracts, contractId, name, locale, description, specificationMinVersion,
+      prefix, badge, price, currency, start, finish, revision, deliveryTime, objectToProperties(<ProductContract>args));
   }
 
   /**
    * Создаёт глубокую копию текущего экземпляра
    */
   public clone(): ProductContract {
-    return ProductContract.build(this.getJSON());
+    return ProductContract.build(this.getJSON(), <ProductContract[]>this.childContracts);
   }
 
   /**
@@ -168,6 +172,7 @@ export interface ProductContractBuild extends ProductContractInput, Form {
  * Интерфейс, содержащий поля, которые могут быть изменены с помощью [[Action]] в [[ProductContract]]
  */
 export interface ProductContractInput {
+  contractId: string;
   name: string;
   description: string;
   prefix: string;

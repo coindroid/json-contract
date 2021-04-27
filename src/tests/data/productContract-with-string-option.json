@@ -1,10 +1,11 @@
 {
+  "contractId": "contract-string",
   "name": "Test1",
   "locale": "EN",
   "description": "Simple test contract",
   "specificationMinVersion": 1,
-  "prefix": "T1",
-  "badge": "test_1",
+  "prefix": "T2",
+  "badge": "test_2",
   "price": 100,
   "currency": "USD",
   "start": 1611492655398,
